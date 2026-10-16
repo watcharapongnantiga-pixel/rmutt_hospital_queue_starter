@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คอนโซลเรียกคิวเจ้าหน้าที่ | RMUTT Hospital Queue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body style="background: #f4f6fa;">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>STAFF CALLING CONSOLE</small>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">หน้าแรก</a>
+        <a href="dashboard.html">แดชบอร์ด</a>
+        <a class="active" href="staff_queue.html">ระบบเจ้าหน้าที่</a>
+        <a href="queue_display.html" target="_blank">เปิดจอคิว TV ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <span class="user-menu-pill">
+          <span class="user-menu-avatar">🩺</span>
+          <span id="staffNameLabel">เจ้าหน้าที่ห้องตรวจ</span>
+        </span>
+        <a href="dashboard.html" class="btn btn-ghost btn-small">กลับแดชบอร์ด</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="staff-console">
+    <div class="container">
+
+      <!-- Top Filters -->
+      <div class="staff-topbar">
+        <div>
+          <span class="auth-card-badge">✦ ระบบห้องตรวจและเรียกคิว</span>
+          <h1 style="font-size: 24px; color: #0d213a; margin: 6px 0 0;">คอนโซลบริหารจัดการคิวตรวจ</h1>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <select id="filterDept" class="form-control" style="width: auto; padding: 10px 14px;">
+            <option value="0">-- ทุกแผนกบริการ --</option>
+            <!-- Injected via JavaScript -->
+          </select>
+
+          <input type="date" id="filterDate" class="form-control" style="width: auto; padding: 9px 12px;">
+
+          <a href="queue_display.html" target="_blank" class="btn btn-primary btn-small"
+            title="เปิดหน้าจอสำหรับผู้รับบริการ">
+            📺 เปิดจอแสดงผล TV
+          </a>
+        </div>
+      </div>
+
+      <div id="flashContainer"></div>
+
+      <!-- Stat Cards -->
+      <div class="staff-stats-row">
+        <div class="stat-box waiting">
+          <div class="stat-icon">◷</div>
+          <div>
+            <div class="stat-number" id="statWaiting">0</div>
+            <div class="stat-label">คิวที่รอรับบริการ</div>
+          </div>
+        </div>
+        <div class="stat-box called">
+          <div class="stat-icon">🔔</div>
+          <div>
+            <div class="stat-number" id="statCalled">0</div>
+            <div class="stat-label">กำลังเรียก / รับบริการ</div>
+          </div>
+        </div>
+        <div class="stat-box completed">
+          <div class="stat-icon">✓</div>
+          <div>
+            <div class="stat-number" id="statCompleted">0</div>
+            <div class="stat-label">ตรวจเสร็จสิ้นแล้ว</div>
+          </div>
+        </div>
+
+        <!-- Quick Call Next Button -->
+        <div style="display: flex; align-items: center;">
+          <button type="button" id="btnCallNext" class="btn btn-primary"
+            style="width: 100%; padding: 18px; font-size: 15px; box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);">
+            🔔 เรียกคิวถัดไปอัตโนมัติ
+          </button>
+        </div>
+      </div>
+
+      <!-- Queue List Table -->
+      <div class="queue-table-card">
+        <div
+          style="padding: 18px 22px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 16px; margin: 0; color: #0f172a;" id="tableTitleDate">
+            รายการคิวตรวจประจำวัน
+          </h2>
+          <span style="font-size: 12px; color: #64748b;" id="totalQueuesCount">ทั้งหมด 0 คิว</span>
+        </div>
+
+        <div id="noQueuesBox" style="display:none; text-align: center; padding: 50px 20px; color: #64748b;">
+          <div style="font-size: 40px; margin-bottom: 10px;">📋</div>
+          <h3 style="font-size: 16px; color: #1e293b; margin: 0 0 4px;">ยังไม่มีรายการคิวในวันนี้</h3>
+          <p style="font-size: 13px; margin: 0;">คุณสามารถไปที่หน้า <a href="book.html"
+              style="color:#2563eb; text-decoration:underline;">จองคิวออนไลน์</a> เพื่อทดลองสร้างคิวนัดหมายใหม่ได้</p>
+        </div>
+
+        <div id="tableWrapper" style="overflow-x: auto;">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>เลขคิว</th>
+                <th>ผู้รับบริการ (HN)</th>
+                <th>แผนก / ห้องตรวจ</th>
+                <th>รอบเวลา</th>
+                <th>สถานะคิว</th>
+                <th>หมายเหตุ/อาการ</th>
+                <th style="text-align: right;">การจัดการคิว</th>
+              </tr>
+            </thead>
+            <tbody id="queueTableBody">
+              <!-- Injected via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    let filterDeptId = 0;
+    let filterDate = AppDB.todayString();
+    let currentQueues = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set default date input
+      const dateInput = document.getElementById('filterDate');
+      dateInput.value = filterDate;
+      dateInput.addEventListener('change', (e) => {
+        filterDate = e.target.value;
+        renderQueues();
+      });
+
+      // Render Departments Dropdown
+      const deptSelect = document.getElementById('filterDept');
+      const depts = AppDB.getDepartments();
+      depts.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = d.name;
+        deptSelect.appendChild(opt);
+      });
+
+      deptSelect.addEventListener('change', (e) => {
+        filterDeptId = Number(e.target.value);
+        renderQueues();
+      });
+
+      // Current user check
+      const user = AppDB.getCurrentUser();
+      if (user) {
+        document.getElementById('staffNameLabel').textContent = user.full_name;
+      }
+
+      // Call Next button
+      document.getElementById('btnCallNext').addEventListener('click', callNextWaiting);
+
+      renderQueues();
+
+      // Listen for updates from other tabs
+      window.addEventListener('storage', renderQueues);
+      window.addEventListener('app_db_update', renderQueues);
+    });
+
+    function renderQueues() {
+      currentQueues = AppDB.getQueues(filterDeptId, filterDate);
+
+      // Sort queues: called first, then serving, waiting, skipped, completed, cancelled
+      const statusWeight = {
+        'called': 1,
+        'serving': 2,
+        'waiting': 3,
+        'skipped': 4,
+        'completed': 5,
+        'cancelled': 6
+      };
+
+      currentQueues.sort((a, b) => {
+        const wA = statusWeight[a.queue_status] || 99;
+        const wB = statusWeight[b.queue_status] || 99;
+        if (wA !== wB) return wA - wB;
+        return a.id - b.id;
+      });
+
+      // Update counters
+      let countWaiting = 0;
+      let countCalled = 0;
+      let countCompleted = 0;
+
+      currentQueues.forEach(q => {
+        if (q.queue_status === 'waiting') countWaiting++;
+        else if (q.queue_status === 'called' || q.queue_status === 'serving') countCalled++;
+        else if (q.queue_status === 'completed') countCompleted++;
+      });
+
+      document.getElementById('statWaiting').textContent = countWaiting;
+      document.getElementById('statCalled').textContent = countCalled;
+      document.getElementById('statCompleted').textContent = countCompleted;
+      document.getElementById('totalQueuesCount').textContent = `ทั้งหมด ${currentQueues.length} คิว`;
+
+      const parts = filterDate.split('-');
+      const dateFmt = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}` : filterDate;
+      document.getElementById('tableTitleDate').textContent = `รายการคิวตรวจประจำวัน (${dateFmt})`;
+
+      const tbody = document.getElementById('queueTableBody');
+      const tableWrapper = document.getElementById('tableWrapper');
+      const noBox = document.getElementById('noQueuesBox');
+
+      if (currentQueues.length === 0) {
+        tableWrapper.style.display = 'none';
+        noBox.style.display = 'block';
+        return;
+      }
+
+      tableWrapper.style.display = 'block';
+      noBox.style.display = 'none';
+
+      const badges = {
+        'waiting': { bg: '#fef3c7', col: '#92400e', text: 'รอตรวจ' },
+        'called': { bg: '#dbeafe', col: '#1d4ed8', text: '🔔 กำลังเรียก' },
+        'serving': { bg: '#f3e8ff', col: '#7e22ce', text: '🩺 เข้าตรวจ' },
+        'completed': { bg: '#dcfce7', col: '#15803d', text: '✓ เสร็จสิ้น' },
+        'skipped': { bg: '#f1f5f9', col: '#64748b', text: 'ข้ามคิว' },
+        'cancelled': { bg: '#fee2e2', col: '#b91c1c', text: '✕ ยกเลิก' }
+      };
+
+      tbody.innerHTML = currentQueues.map(q => {
+        const badge = badges[q.queue_status] || { bg: '#f1f5f9', col: '#475569', text: q.queue_status };
+        const phoneHtml = q.phone ? `<div style="font-size: 11px; color: #8292a8;">📞 ${q.phone}</div>` : '';
+        const notesHtml = q.notes ? q.notes : '—';
+
+        // Action buttons based on status
+        let actionButtons = '';
+        if (q.queue_status === 'waiting' || q.queue_status === 'skipped') {
+          actionButtons += `<button type="button" class="queue-pill-btn btn-call" onclick="actionQueue(${q.id}, 'called')">🔔 เรียกคิว</button>`;
+        }
+        if (q.queue_status === 'called') {
+          actionButtons += `<button type="button" class="queue-pill-btn btn-serving" onclick="actionQueue(${q.id}, 'serving')">🩺 เริ่มตรวจ</button>`;
+          actionButtons += `<button type="button" class="queue-pill-btn btn-call" title="เรียกซ้ำ" onclick="actionQueue(${q.id}, 'called')">🔔 เรียกซ้ำ</button>`;
+        }
+        if (q.queue_status === 'serving') {
+          actionButtons += `<button type="button" class="queue-pill-btn btn-complete" onclick="actionQueue(${q.id}, 'completed')">✓ ตรวจเสร็จ</button>`;
+        }
+        if (q.queue_status === 'waiting' || q.queue_status === 'called') {
+          actionButtons += `<button type="button" class="queue-pill-btn btn-skip" title="ข้ามคิวนี้" onclick="actionQueue(${q.id}, 'skipped')">ข้าม</button>`;
+        }
+        if (q.queue_status !== 'completed' && q.queue_status !== 'cancelled') {
+          actionButtons += `<button type="button" class="queue-pill-btn" style="background:none; color:#ef4444;" title="ยกเลิกคิว" onclick="actionCancel(${q.id}, '${q.queue_number}')">✕</button>`;
+        }
+
+        return `
+          <tr>
+            <td>
+              <strong style="font-size: 18px; color: #2563eb; letter-spacing: 0.5px;">
+                ${q.queue_number}
+              </strong>
+              <div style="font-size: 11px; color: #94a3b8;">${q.booking_code}</div>
+            </td>
+            <td>
+              <strong>${q.full_name}</strong>
+              <div style="font-size: 11px; color: #64748b;">HN: ${q.hn || '—'}</div>
+              ${phoneHtml}
+            </td>
+            <td>
+              <div>${q.department_name}</div>
+              <small style="color: #64748b;">${q.location || ''}</small>
+            </td>
+            <td>
+              09:00 - 12:00 น.
+            </td>
+            <td>
+              <span style="display:inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: ${badge.bg}; color: ${badge.col};">
+                ${badge.text}
+              </span>
+            </td>
+            <td style="max-width: 180px; font-size: 12px; color: #64748b;">
+              ${notesHtml}
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <div style="display: inline-flex; gap: 6px;">
+                ${actionButtons}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function actionQueue(queueId, newStatus) {
+      try {
+        const q = AppDB.updateQueueStatus(queueId, newStatus);
+        renderQueues();
+
+        if (newStatus === 'called') {
+          announceVoice(q.queue_number, q.department_name, q.location);
+          AppDB.setFlash('success', `เรียกคิว ${q.queue_number} (${q.full_name}) เรียบร้อยแล้ว`);
+        } else if (newStatus === 'serving') {
+          AppDB.setFlash('info', `คิว ${q.queue_number} กำลังรับบริการตรวจ`);
+        } else if (newStatus === 'completed') {
+          AppDB.setFlash('success', `บันทึกคิว ${q.queue_number} ตรวจเสร็จสิ้นแล้ว`);
+        } else if (newStatus === 'skipped') {
+          AppDB.setFlash('warning', `ข้ามคิว ${q.queue_number}`);
+        }
+
+        // Render flash
+        const flashHtml = AppDB.renderFlash();
+        if (flashHtml) {
+          document.getElementById('flashContainer').innerHTML = flashHtml;
+        }
+
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function actionCancel(queueId, queueNum) {
+      if (confirm(`ยืนยันยกเลิกคิว ${queueNum} หรือไม่?`)) {
+        AppDB.updateQueueStatus(queueId, 'cancelled');
+        renderQueues();
+      }
+    }
+
+    function callNextWaiting() {
+      const waiting = currentQueues.find(q => q.queue_status === 'waiting');
+      if (waiting) {
+        actionQueue(waiting.id, 'called');
+      } else {
+        alert('ไม่มีคิวที่กำลังรอรับบริการในขณะนี้');
+      }
+    }
+
+    // Voice announcement
+    function announceVoice(queueNum, deptName, locName) {
+      if ('speechSynthesis' in window) {
+        const splitNum = queueNum.split('').join(' ');
+        const text = `ขอเชิญหมายเลข ${splitNum} ที่${deptName} ${locName || ''} ค่ะ`;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ | RMUTT Hospital Queue</title>
+  <meta name="description" content="เข้าสู่ระบบจองคิวออนไลน์ RMUTT Health">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body class="auth-page">
+
+  <!-- Header -->
+  <header class="auth-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html" aria-label="กลับสู่หน้าแรก">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <a href="register.html" class="btn btn-primary btn-small">สมัครสมาชิกใหม่ <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="auth-container">
+    <div class="auth-card-wrapper">
+      <div class="auth-card">
+        <div class="auth-card-head">
+          <span class="auth-card-badge">✦ ระบบยืนยันตัวตน</span>
+          <h1>เข้าสู่ระบบ</h1>
+          <p>กรอกข้อมูลบัญชีเพื่อเข้าจัดการคิวและการนัดหมายของคุณ</p>
+        </div>
+
+        <div id="flashContainer"></div>
+
+        <div id="loginErrorAlert" class="alert alert-danger" style="display: none;" role="alert">
+          <span class="alert-icon">✕</span>
+          <div class="alert-content" id="loginErrorMessage">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+          <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'"
+            aria-label="ปิด">×</button>
+        </div>
+
+        <!-- Quick Demo Accounts -->
+        <div
+          style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px 14px; margin-bottom: 20px;">
+          <small style="display:block; color:#64748b; font-weight:600; margin-bottom: 6px;">⚡ บัญชีทดสอบระบบด่วน (Click
+            to fill):</small>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost btn-small" style="font-size:11px; padding:5px 9px;"
+              onclick="fillDemo('patient@hospital.com', 'patient1234')">
+              👤 คนไข้ (Patient)
+            </button>
+            <button type="button" class="btn btn-ghost btn-small" style="font-size:11px; padding:5px 9px;"
+              onclick="fillDemo('staff@hospital.com', 'staff1234')">
+              🩺 เจ้าหน้าที่ (Staff)
+            </button>
+            <button type="button" class="btn btn-ghost btn-small" style="font-size:11px; padding:5px 9px;"
+              onclick="fillDemo('admin@hospital.com', 'admin1234')">
+              🔑 ผู้ดูแล (Admin)
+            </button>
+          </div>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="email">อีเมลบัญชีผู้ใช้ <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉</span>
+              <input type="email" id="email" name="email" class="form-control" placeholder="example@mail.com" required
+                autofocus>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">รหัสผ่าน <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="password" name="password" class="form-control" placeholder="กรอกรหัสผ่านของคุณ"
+                required>
+              <button type="button" class="btn-toggle-pwd"
+                onclick="togglePasswordVisibility('password', this)">แสดง</button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="rememberMe" name="remember_me" value="1">
+              <span>จำอีเมลไว้ในเครื่องนี้</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-btn-submit" id="btnSubmit">
+            เข้าสู่ระบบ <span>→</span>
+          </button>
+        </form>
+
+        <div class="auth-footer-links">
+          ยังไม่มีบัญชีผู้ใช้งาน? <a href="register.html">สมัครสมาชิกที่นี่</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    // Redirect if already logged in
+    AppDB.requireGuest('dashboard.html');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Flash message
+      const flash = AppDB.renderFlash();
+      if (flash) {
+        document.getElementById('flashContainer').innerHTML = flash;
+      }
+
+      // Check remembered email
+      const rem = localStorage.getItem('rmutt_remember_email');
+      if (rem) {
+        document.getElementById('email').value = rem;
+        document.getElementById('rememberMe').checked = true;
+      }
+    });
+
+    function fillDemo(email, pwd) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = pwd;
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'ซ่อน';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'แสดง';
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('loginErrorAlert');
+      const errMsg = document.getElementById('loginErrorMessage');
+      errBox.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const remember = document.getElementById('rememberMe').checked;
+
+      if (!email || !password) {
+        errMsg.textContent = 'กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน';
+        errBox.style.display = 'flex';
+        return;
+      }
+
+      try {
+        const user = AppDB.login(email, password);
+
+        if (remember) {
+          localStorage.setItem('rmutt_remember_email', email);
+        } else {
+          localStorage.removeItem('rmutt_remember_email');
+        }
+
+        AppDB.setFlash('success', `ยินดีต้อนรับคุณ ${user.full_name}! เข้าสู่ระบบสำเร็จ`);
+
+        // Check if redirect query param exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || 'dashboard.html';
+        window.location.href = redirect;
+
+      } catch (err) {
+        errMsg.textContent = err.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+        errBox.style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+
+</html>

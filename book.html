@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จองคิวออนไลน์ | RMUTT Hospital Queue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">หน้าแรก</a>
+        <a href="dashboard.html">แดชบอร์ด</a>
+        <a class="active" href="book.html">จองคิวออนไลน์</a>
+        <a href="queue_display.html" target="_blank">จอแสดงผลคิว (TV) ↗</a>
+        <a href="staff_queue.html" style="color:#2563eb; font-weight:600;">ระบบเจ้าหน้าที่ 🩺</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="user-menu-pill">
+          <span class="user-menu-avatar" id="navAvatar">U</span>
+          <span id="navName">ผู้ใช้งาน</span>
+        </a>
+        <button type="button" class="btn btn-ghost btn-small" onclick="AppDB.logout()">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="booking-container">
+    <div class="container">
+
+      <div class="booking-header">
+        <span class="auth-card-badge">✦ ระบบนัดหมายออนไลน์</span>
+        <h1>จองคิวเข้ารับบริการทางการแพทย์</h1>
+        <p>เลือกแผนก วัน และช่วงเวลาที่ต้องการเข้ารับบริการ พร้อมรับหมายเลขคิวทันที</p>
+      </div>
+
+      <div id="flashContainer"></div>
+      <div id="bookingErrorAlert" class="alert alert-danger" style="display:none;" role="alert">
+        <span class="alert-icon">✕</span>
+        <div class="alert-content" id="bookingErrorMessage"></div>
+        <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'"
+          aria-label="ปิด">×</button>
+      </div>
+
+      <form id="bookingForm" novalidate>
+        <div class="booking-grid">
+
+          <!-- Left Column: Steps -->
+          <div class="booking-steps-col">
+
+            <!-- Step 1: Select Department -->
+            <div class="booking-card">
+              <h2 class="booking-card-title">
+                <span class="step-badge">1</span>
+                <span>เลือกแผนกที่ต้องการรับบริการ</span>
+              </h2>
+
+              <div class="dept-grid" id="deptGrid">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+
+            <!-- Step 2: Select Date -->
+            <div class="booking-card">
+              <h2 class="booking-card-title">
+                <span class="step-badge">2</span>
+                <span>เลือกวันที่เข้ารับบริการ</span>
+              </h2>
+
+              <div class="form-group" style="max-width: 320px;">
+                <label class="form-label" for="bookingDate">วันที่นัดหมาย <span class="required">*</span></label>
+                <div class="input-wrapper">
+                  <span class="input-icon">📅</span>
+                  <input type="date" id="bookingDate" name="date" class="form-control" required>
+                </div>
+                <small style="color: #64748b; font-size: 11px; margin-top: 4px; display: block;">
+                  เปิดจองล่วงหน้า 14 วัน (เปิดบริการวันจันทร์ - วันเสาร์)
+                </small>
+              </div>
+            </div>
+
+            <!-- Step 3: Select Time Slot -->
+            <div class="booking-card">
+              <h2 class="booking-card-title">
+                <span class="step-badge">3</span>
+                <span>เลือกรอบเวลาที่สะดวก</span>
+              </h2>
+
+              <div id="slotsContainer" class="slots-container">
+                <!-- Dynamically loaded via JavaScript -->
+              </div>
+
+              <div id="noSlotsMessage"
+                style="display:none; padding: 25px; text-align: center; color: #64748b; background: #f8fafc; border-radius: 12px;">
+                <div style="font-size: 28px; margin-bottom: 8px;">🗓️</div>
+                <strong style="color: #1e293b; font-size: 14px;">ไม่พบรอบเวลาให้บริการในวันที่เลือก</strong>
+                <p style="font-size: 12px; margin: 4px 0 0;">กรุณาลองเปลี่ยนวันที่ หรือเลือกแผนกอื่น</p>
+              </div>
+            </div>
+
+            <!-- Step 4: Symptoms / Notes -->
+            <div class="booking-card">
+              <h2 class="booking-card-title">
+                <span class="step-badge">4</span>
+                <span>ระบุอาการเบื้องต้น หรือหมายเหตุ (ถ้ามี)</span>
+              </h2>
+
+              <div class="form-group">
+                <label class="form-label" for="notes">รายละเอียดอาการ หรือความประสงค์ในการตรวจ</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3"
+                  placeholder="เช่น มีไข้ ไอ เจ็บคอ 2 วัน หรือ ต้องการตรวจสุขภาพประจำปี..."></textarea>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Sticky Summary & Confirmation -->
+          <div class="booking-summary-col">
+            <div class="booking-summary-card">
+              <h3 class="summary-title">สรุปข้อมูลการจอง</h3>
+
+              <div class="summary-line">
+                <span class="summary-label">ผู้รับบริการ:</span>
+                <span class="summary-value" id="summaryUser">—</span>
+              </div>
+              <div class="summary-line">
+                <span class="summary-label">หมายเลข HN:</span>
+                <span class="summary-value" style="color:#2563eb;" id="summaryHN">—</span>
+              </div>
+              <div class="summary-divider"></div>
+
+              <div class="summary-line">
+                <span class="summary-label">แผนกตรวจ:</span>
+                <span class="summary-value" id="summaryDept">—</span>
+              </div>
+              <div class="summary-line">
+                <span class="summary-label">สถานที่:</span>
+                <span class="summary-value" id="summaryLoc" style="font-size:11px; color:#475569;">—</span>
+              </div>
+              <div class="summary-line">
+                <span class="summary-label">วันที่นัดหมาย:</span>
+                <span class="summary-value" id="summaryDate">—</span>
+              </div>
+              <div class="summary-line">
+                <span class="summary-label">รอบเวลา:</span>
+                <span class="summary-value" id="summaryTime" style="color: #16a34a;">กรุณาเลือกรอบเวลา</span>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <button type="submit" id="btnSubmitBooking" class="btn btn-primary"
+                style="width: 100%; padding: 14px; font-size: 14px;" disabled>
+                ยืนยันการจองคิว <span>→</span>
+              </button>
+
+              <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 12px 0 0;">
+                ระบบจะสร้างหมายเลขคิวและบันทึกข้อมูลการนัดหมายทันที
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© 2026 RMUTT Hospital Queue — ระบบจองคิวออนไลน์</span>
+      <a href="dashboard.html" style="color: inherit;">กลับแดชบอร์ด</a>
+    </div>
+  </footer>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    const user = AppDB.requireLogin('login.html');
+
+    let currentDeptId = 1;
+    let currentDate = AppDB.todayString();
+    let selectedSlotId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!user) return;
+
+      // Update Nav
+      const initial = user.full_name ? user.full_name.charAt(0) : 'U';
+      document.getElementById('navAvatar').textContent = initial;
+      document.getElementById('navName').textContent = user.full_name;
+
+      // Set Summary Profile
+      document.getElementById('summaryUser').textContent = user.full_name;
+      document.getElementById('summaryHN').textContent = user.hn || 'จะออกให้อัตโนมัติ';
+
+      // Set Date bounds
+      const dateInput = document.getElementById('bookingDate');
+      dateInput.value = currentDate;
+      dateInput.min = AppDB.todayString();
+
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + 14);
+      const year = maxDate.getFullYear();
+      const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+      const day = String(maxDate.getDate()).padStart(2, '0');
+      dateInput.max = `${year}-${month}-${day}`;
+
+      dateInput.addEventListener('change', (e) => {
+        currentDate = e.target.value;
+        updateSummaryDate();
+        loadSlots();
+      });
+
+      renderDepartments();
+      updateSummaryDate();
+      loadSlots();
+    });
+
+    function renderDepartments() {
+      const depts = AppDB.getDepartments();
+      const grid = document.getElementById('deptGrid');
+
+      const icons = {
+        1: '🩺',
+        2: '🦷',
+        3: '🤸',
+        4: '👁️'
+      };
+
+      grid.innerHTML = depts.map((d, index) => {
+        const isChecked = (d.id === currentDeptId) ? 'checked' : '';
+        const icon = icons[d.id] || '🩺';
+        return `
+          <label class="dept-card-label">
+            <input type="radio" name="department_id" value="${d.id}" ${isChecked} 
+                   data-name="${d.name}" data-location="${d.location}"
+                   onchange="handleDeptSelect(this)">
+            <div class="dept-card-inner">
+              <div class="dept-icon">${icon}</div>
+              <strong>${d.name}</strong>
+              <p>${d.description}</p>
+              <span class="dept-location">📍 ${d.location}</span>
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      updateSummaryDept();
+    }
+
+    function handleDeptSelect(radio) {
+      currentDeptId = Number(radio.value);
+      updateSummaryDept();
+      loadSlots();
+    }
+
+    function updateSummaryDept() {
+      const depts = AppDB.getDepartments();
+      const dept = depts.find(d => d.id === currentDeptId);
+      if (dept) {
+        document.getElementById('summaryDept').textContent = dept.name;
+        document.getElementById('summaryLoc').textContent = dept.location;
+      }
+    }
+
+    function updateSummaryDate() {
+      if (currentDate) {
+        const parts = currentDate.split('-');
+        if (parts.length === 3) {
+          document.getElementById('summaryDate').textContent = `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}`;
+          return;
+        }
+      }
+      document.getElementById('summaryDate').textContent = currentDate || '—';
+    }
+
+    function loadSlots() {
+      const container = document.getElementById('slotsContainer');
+      const noSlots = document.getElementById('noSlotsMessage');
+      const submitBtn = document.getElementById('btnSubmitBooking');
+
+      selectedSlotId = null;
+      submitBtn.disabled = true;
+      document.getElementById('summaryTime').textContent = 'กรุณาเลือกรอบเวลา';
+      document.getElementById('summaryTime').style.color = '#e11d48';
+
+      const slots = AppDB.getSchedules(currentDeptId, currentDate);
+
+      if (slots && slots.length > 0) {
+        noSlots.style.display = 'none';
+        container.innerHTML = slots.map(s => {
+          const avail = Math.max(0, s.capacity - s.booked_count);
+          const isFull = avail <= 0;
+          const timeLabel = `${s.start_time} - ${s.end_time} น.`;
+          return `
+            <label class="slot-radio">
+              <input type="radio" name="schedule_id" value="${s.id}" ${isFull ? 'disabled' : ''} 
+                     onchange="handleSlotSelect(${s.id}, '${timeLabel}')">
+              <div class="slot-card ${isFull ? 'disabled' : ''}">
+                <div class="slot-time">${timeLabel}</div>
+                <div class="slot-quota ${isFull ? 'full' : ''}">
+                  ${isFull ? '✕ เต็มแล้ว' : `✓ ว่าง ${avail} / ${s.capacity} ที่`}
+                </div>
+              </div>
+            </label>
+          `;
+        }).join('');
+      } else {
+        container.innerHTML = '';
+        noSlots.style.display = 'block';
+      }
+    }
+
+    function handleSlotSelect(slotId, timeLabel) {
+      selectedSlotId = slotId;
+      document.getElementById('summaryTime').textContent = timeLabel;
+      document.getElementById('summaryTime').style.color = '#2563eb';
+      document.getElementById('btnSubmitBooking').disabled = false;
+    }
+
+    // Submit Booking
+    document.getElementById('bookingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('bookingErrorAlert');
+      const errMsg = document.getElementById('bookingErrorMessage');
+      errBox.style.display = 'none';
+
+      if (!selectedSlotId) {
+        errMsg.textContent = 'กรุณาเลือกรอบเวลาตรวจ';
+        errBox.style.display = 'flex';
+        return;
+      }
+
+      const notes = document.getElementById('notes').value.trim();
+
+      try {
+        const result = AppDB.bookAppointment({
+          departmentId: currentDeptId,
+          dateStr: currentDate,
+          scheduleId: selectedSlotId,
+          notes: notes
+        });
+
+        AppDB.setFlash('success', `จองคิวสำเร็จ! หมายเลขคิวของคุณคือ ${result.queueNumber}`);
+        window.location.href = `ticket.html?code=${encodeURIComponent(result.bookingCode)}`;
+
+      } catch (err) {
+        errMsg.textContent = err.message || 'เกิดข้อผิดพลาดในการจองคิว';
+        errBox.style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+
+</html>

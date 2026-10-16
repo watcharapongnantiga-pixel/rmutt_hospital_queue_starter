@@ -77,6 +77,11 @@ $userInitials = mb_substr($user['full_name'], 0, 1, 'UTF-8');
       <nav class="main-nav" id="mainNav">
         <a href="index.php">หน้าแรก</a>
         <a class="active" href="dashboard.php">แดชบอร์ด</a>
+        <a href="book.php">จองคิวออนไลน์</a>
+        <a href="queue_display.php" target="_blank">จอแสดงผลคิว (TV) ↗</a>
+        <?php if (has_role(['staff', 'admin']) || isset($_SESSION['staff_demo_mode'])): ?>
+          <a href="staff_queue.php" style="color:#2563eb; font-weight:600;">ระบบเจ้าหน้าที่ 🩺</a>
+        <?php endif; ?>
       </nav>
       <div class="nav-actions">
         <span class="user-menu-pill">
@@ -109,9 +114,14 @@ $userInitials = mb_substr($user['full_name'], 0, 1, 'UTF-8');
           </div>
         </div>
         <div class="dash-actions-top">
-          <a href="index.php#services" class="btn btn-white btn-small">
+          <a href="book.php" class="btn btn-white btn-small">
             ＋ จองคิวตรวจใหม่
           </a>
+          <?php if (has_role(['staff', 'admin']) || isset($_SESSION['staff_demo_mode'])): ?>
+            <a href="staff_queue.php" class="btn btn-primary btn-small" style="background:#2563eb;">
+              🩺 คอนโซลเจ้าหน้าที่
+            </a>
+          <?php endif; ?>
           <a href="logout.php" class="btn btn-outline-light btn-small">
             ออกจากระบบ
           </a>
@@ -133,32 +143,32 @@ $userInitials = mb_substr($user['full_name'], 0, 1, 'UTF-8');
           <div class="dash-card">
             <h2 class="dash-card-title">เมนูบริการด่วน (Quick Services)</h2>
             <div class="quick-action-cards">
-              <a href="index.php#services" class="quick-btn">
+              <a href="book.php" class="quick-btn">
                 <div class="quick-icon blue">▦</div>
                 <div class="quick-text">
                   <h4>จองคิวออนไลน์</h4>
                   <p>เลือกแผนกบริการ วัน และเวลานัดหมายล่วงหน้า</p>
                 </div>
               </a>
-              <a href="index.php#queue-info" class="quick-btn">
-                <div class="quick-icon purple">◷</div>
+              <a href="queue_display.php" target="_blank" class="quick-btn">
+                <div class="quick-icon purple">📺</div>
                 <div class="quick-text">
-                  <h4>ติดตามสถานะคิว</h4>
-                  <p>เช็กสถานะคิวตรวจและเวลาที่เรียกรับบริการ</p>
+                  <h4>จอแสดงผลคิวสด (TV)</h4>
+                  <p>เปิดดูหน้าจอเรียกคิวขนาดใหญ่พร้อมเสียงอ่าน</p>
+                </div>
+              </a>
+              <a href="staff_queue.php" class="quick-btn">
+                <div class="quick-icon green">🩺</div>
+                <div class="quick-text">
+                  <h4>ระบบเรียกคิวเจ้าหน้าที่</h4>
+                  <p>สำหรับแพทย์/พยาบาลในการกดเรียกและบันทึกคิว</p>
                 </div>
               </a>
               <a href="#history" class="quick-btn">
-                <div class="quick-icon green">✓</div>
+                <div class="quick-icon amber">✓</div>
                 <div class="quick-text">
                   <h4>ประวัติการนัดหมาย</h4>
-                  <p>ดูรายการนัดหมายย้อนหลังและข้อมูลการตรวจ</p>
-                </div>
-              </a>
-              <a href="#profile" class="quick-btn">
-                <div class="quick-icon amber">👤</div>
-                <div class="quick-text">
-                  <h4>ข้อมูลบัญชี</h4>
-                  <p>ตรวจสอบและปรับปรุงข้อมูลการติดต่อของคุณ</p>
+                  <p>ดูรายการนัดหมายย้อนหลังและพิมพ์บัตรคิว</p>
                 </div>
               </a>
             </div>
@@ -177,7 +187,7 @@ $userInitials = mb_substr($user['full_name'], 0, 1, 'UTF-8');
                 <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">📋</div>
                 <h3 style="font-size: 16px; margin: 0 0 6px; color: #1e293b;">ยังไม่มีรายการนัดหมายในขณะนี้</h3>
                 <p style="font-size: 13px; margin: 0 0 20px;">คุณสามารถกดปุ่มด้านล่างเพื่อเริ่มเลือกแผนกและทำการนัดหมายคิวออนไลน์ได้ทันที</p>
-                <a href="index.php#services" class="btn btn-primary btn-small">เริ่มทำการจองคิว <span>→</span></a>
+                <a href="book.php" class="btn btn-primary btn-small">เริ่มทำการจองคิว <span>→</span></a>
               </div>
             <?php else: ?>
               <div style="overflow-x: auto;">
@@ -189,26 +199,34 @@ $userInitials = mb_substr($user['full_name'], 0, 1, 'UTF-8');
                       <th style="padding: 10px 8px;">วัน-เวลา</th>
                       <th style="padding: 10px 8px;">เลขคิว</th>
                       <th style="padding: 10px 8px;">สถานะ</th>
+                      <th style="padding: 10px 8px; text-align: right;">บัตรคิว</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php foreach ($appointments as $appt): ?>
                       <tr style="border-bottom: 1px solid #f1f4f9;">
                         <td style="padding: 12px 8px; font-weight: 600; color: #2869d8;">
-                          <?= htmlspecialchars($appt['booking_code']) ?>
+                          <a href="ticket.php?code=<?= urlencode($appt['booking_code']) ?>" style="text-decoration:underline;">
+                            <?= htmlspecialchars($appt['booking_code']) ?>
+                          </a>
                         </td>
                         <td style="padding: 12px 8px;"><?= htmlspecialchars($appt['department_name']) ?></td>
                         <td style="padding: 12px 8px;">
                           <?= htmlspecialchars($appt['service_date']) ?><br>
-                          <small style="color: #64748b;"><?= htmlspecialchars($appt['start_time']) ?> - <?= htmlspecialchars($appt['end_time']) ?></small>
+                          <small style="color: #64748b;"><?= htmlspecialchars(substr($appt['start_time'], 0, 5)) ?> - <?= htmlspecialchars(substr($appt['end_time'], 0, 5)) ?> น.</small>
                         </td>
                         <td style="padding: 12px 8px; font-weight: 700; color: #0d213a;">
-                          <?= htmlspecialchars($appt['queue_number'] ?? '—') ?>
+                          <span style="font-size: 16px; color: #2563eb;"><?= htmlspecialchars($appt['queue_number'] ?? '—') ?></span>
                         </td>
                         <td style="padding: 12px 8px;">
                           <span class="badge" style="background:#eaf2ff; color:#2869d8;">
                             <?= htmlspecialchars($appt['appointment_status']) ?>
                           </span>
+                        </td>
+                        <td style="padding: 12px 8px; text-align: right;">
+                          <a href="ticket.php?code=<?= urlencode($appt['booking_code']) ?>" class="btn btn-ghost btn-small" style="padding: 6px 10px; font-size: 11px;">
+                            ดูบัตรคิว ↗
+                          </a>
                         </td>
                       </tr>
                     <?php endforeach; ?>

@@ -272,3 +272,31 @@ function get_role_label(?string $role): string {
     ];
     return $map[$role] ?? 'ผู้ใช้งานทั่วไป';
 }
+
+/**
+ * Get or create patient record for a user
+ * @param PDO $pdo
+ * @param int $userId
+ * @return int Patient ID
+ */
+function get_or_create_patient_id(PDO $pdo, int $userId): int {
+    $stmt = $pdo->prepare("SELECT id, patient_number FROM patients WHERE user_id = :uid LIMIT 1");
+    $stmt->execute([':uid' => $userId]);
+    $patient = $stmt->fetch();
+
+    if ($patient) {
+        return (int)$patient['id'];
+    }
+
+    $hn = generate_patient_number($pdo);
+    $ins = $pdo->prepare("INSERT INTO patients (user_id, patient_number, created_at) VALUES (:uid, :hn, NOW())");
+    $ins->execute([':uid' => $userId, ':hn' => $hn]);
+    
+    $newId = (int)$pdo->lastInsertId();
+    if (isset($_SESSION['user'])) {
+        $_SESSION['user']['patient_id'] = $newId;
+        $_SESSION['user']['patient_number'] = $hn;
+    }
+    return $newId;
+}
+

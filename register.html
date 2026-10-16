@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมัครสมาชิกผู้รับบริการ | RMUTT Hospital Queue</title>
+  <meta name="description" content="สมัครสมาชิกเพื่อเข้าใช้งานระบบจองคิวออนไลน์ RMUTT Health">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body class="auth-page">
+
+  <!-- Header -->
+  <header class="auth-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html" aria-label="กลับสู่หน้าแรก">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <a href="login.html" class="btn btn-ghost btn-small">มีบัญชีแล้ว? เข้าสู่ระบบ</a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="auth-container">
+    <div class="auth-card-wrapper wide">
+      <div class="auth-card">
+        <div class="auth-card-head">
+          <span class="auth-card-badge">✦ สร้างบัญชีผู้รับบริการ</span>
+          <h1>สมัครสมาชิกใหม่</h1>
+          <p>กรอกข้อมูลเพื่อลงทะเบียนเข้าใช้งานระบบจองคิวและรับหมายเลขผู้ป่วย (HN)</p>
+        </div>
+
+        <div id="flashContainer"></div>
+
+        <div id="generalErrorAlert" class="alert alert-danger" style="display:none;" role="alert">
+          <span class="alert-icon">✕</span>
+          <div class="alert-content" id="generalErrorMessage"></div>
+          <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'"
+            aria-label="ปิด">×</button>
+        </div>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="full_name">ชื่อ - นามสกุล <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="full_name" name="full_name" class="form-control" placeholder="เช่น นายสมชาย ใจดี"
+                required autofocus>
+            </div>
+            <div id="err_full_name" class="field-error" style="display:none;"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="email">อีเมล <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">✉</span>
+                <input type="email" id="email" name="email" class="form-control" placeholder="example@mail.com"
+                  required>
+              </div>
+              <div id="err_email" class="field-error" style="display:none;"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">เบอร์โทรศัพท์มือถือ <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="0812345678" required>
+              </div>
+              <div id="err_phone" class="field-error" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="dob">วัน/เดือน/ปีเกิด (สำหรับประวัติผู้ป่วย)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📅</span>
+              <input type="date" id="dob" name="dob" class="form-control" max="2026-10-16">
+            </div>
+            <div id="err_dob" class="field-error" style="display:none;"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="password">รหัสผ่าน <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="password" name="password" class="form-control"
+                  placeholder="อย่างน้อย 6 ตัวอักษร" required>
+                <button type="button" class="btn-toggle-pwd"
+                  onclick="togglePasswordVisibility('password', this)">แสดง</button>
+              </div>
+              <div class="pwd-strength-bar">
+                <div class="pwd-strength-fill" id="pwdStrengthFill"></div>
+              </div>
+              <div id="err_password" class="field-error" style="display:none;"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirm_password">ยืนยันรหัสผ่าน <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                  placeholder="กรอกรหัสผ่านเดิมอีกครั้ง" required>
+                <button type="button" class="btn-toggle-pwd"
+                  onclick="togglePasswordVisibility('confirm_password', this)">แสดง</button>
+              </div>
+              <div id="pwdMatchMsg" class="field-error" style="display:none;"></div>
+              <div id="err_confirm_password" class="field-error" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="checkbox-label">
+              <input type="checkbox" name="agree_terms" id="agree_terms" value="1" required>
+              <span>ข้าพเจ้ายินยอมให้จัดเก็บและประมวลผลข้อมูลส่วนบุคคลตามนโยบาย PDPA
+                สำหรับการนัดหมายและการให้บริการสุขภาพ</span>
+            </label>
+            <div id="err_agree_terms" class="field-error" style="display:none;"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-btn-submit">
+            สร้างบัญชีและรับหมายเลขคิว <span>→</span>
+          </button>
+        </form>
+
+        <div class="auth-footer-links">
+          มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="login.html">เข้าสู่ระบบที่นี่</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    AppDB.requireGuest('dashboard.html');
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'ซ่อน';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'แสดง';
+      }
+    }
+
+    const pwdInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const strengthFill = document.getElementById('pwdStrengthFill');
+    const matchMsg = document.getElementById('pwdMatchMsg');
+
+    if (pwdInput && strengthFill) {
+      pwdInput.addEventListener('input', () => {
+        const val = pwdInput.value;
+        strengthFill.className = 'pwd-strength-fill';
+        if (val.length === 0) {
+          strengthFill.style.width = '0%';
+        } else if (val.length < 6) {
+          strengthFill.classList.add('weak');
+        } else if (val.length < 10) {
+          strengthFill.classList.add('medium');
+        } else {
+          strengthFill.classList.add('strong');
+        }
+        checkMatch();
+      });
+    }
+
+    if (confirmInput) {
+      confirmInput.addEventListener('input', checkMatch);
+    }
+
+    function checkMatch() {
+      if (!confirmInput.value) {
+        matchMsg.style.display = 'none';
+        return;
+      }
+      if (pwdInput.value !== confirmInput.value) {
+        matchMsg.style.display = 'flex';
+        matchMsg.textContent = '⚠ รหัสผ่านทั้งสองช่องยังไม่ตรงกัน';
+        matchMsg.style.color = '#dc2626';
+      } else {
+        matchMsg.style.display = 'flex';
+        matchMsg.textContent = '✓ รหัสผ่านตรงกันเรียบร้อย';
+        matchMsg.style.color = '#16a34a';
+      }
+    }
+
+    // Submit Registration
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Clear previous field errors
+      ['full_name', 'email', 'phone', 'dob', 'password', 'confirm_password', 'agree_terms'].forEach(f => {
+        const el = document.getElementById('err_' + f);
+        if (el) el.style.display = 'none';
+      });
+      document.getElementById('generalErrorAlert').style.display = 'none';
+
+      const fullName = document.getElementById('full_name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const dob = document.getElementById('dob').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      const agree = document.getElementById('agree_terms').checked;
+
+      let hasError = false;
+
+      if (!fullName || fullName.length < 2) {
+        showError('full_name', 'กรุณาระบุชื่อ-นามสกุลให้ถูกต้อง (อย่างน้อย 2 ตัวอักษร)');
+        hasError = true;
+      }
+      if (!email || !email.includes('@')) {
+        showError('email', 'กรุณากรอกอีเมลที่ถูกต้อง');
+        hasError = true;
+      }
+      if (!phone || phone.length < 9) {
+        showError('phone', 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
+        hasError = true;
+      }
+      if (!password || password.length < 6) {
+        showError('password', 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+        hasError = true;
+      } else if (password !== confirmPassword) {
+        showError('confirm_password', 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+        hasError = true;
+      }
+      if (!agree) {
+        showError('agree_terms', 'กรุณายินยอมตามข้อกำหนด PDPA เพื่อลงทะเบียน');
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      try {
+        const newUser = AppDB.register({
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          dob: dob,
+          password: password
+        });
+
+        AppDB.setFlash('success', `ยินดีต้อนรับคุณ ${newUser.full_name}! สมัครสมาชิกสำเร็จและออกหมายเลขประจำตัวผู้ป่วย (${newUser.hn}) เรียบร้อยแล้ว`);
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        const genBox = document.getElementById('generalErrorAlert');
+        document.getElementById('generalErrorMessage').textContent = err.message || 'เกิดข้อผิดพลาดในการลงทะเบียน';
+        genBox.style.display = 'flex';
+      }
+    });
+
+    function showError(fieldId, msg) {
+      const el = document.getElementById('err_' + fieldId);
+      if (el) {
+        el.textContent = '⚠ ' + msg;
+        el.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+
+</html>

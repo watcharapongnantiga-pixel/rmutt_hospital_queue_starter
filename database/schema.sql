@@ -128,3 +128,46 @@ WHERE NOT EXISTS (SELECT 1 FROM departments WHERE name = 'ทันตกรร�
 INSERT INTO departments (name, description, location_label)
 SELECT 'กายภาพบำบัด', 'ตัวอย่างแผนกสำหรับทดสอบระบบ', 'โปรดตรวจสอบสถานที่กับโรงพยาบาล'
 WHERE NOT EXISTS (SELECT 1 FROM departments WHERE name = 'กายภาพบำบัด');
+
+-- Demo Users (passwords: staff1234, admin1234, patient1234)
+INSERT INTO users (id, full_name, email, password_hash, role, is_active)
+SELECT 1, 'เจ้าหน้าที่ ประจำห้องตรวจ', 'staff@hospital.com', '$2y$10$tZ261jUe6Xj149y8G1Ww1eH7dZcfsT2a93M1g7Wc6lJ5C7v4fJcba', 'staff', 1
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'staff@hospital.com');
+
+INSERT INTO users (id, full_name, email, password_hash, role, is_active)
+SELECT 2, 'ผู้ดูแลระบบ ไอที', 'admin@hospital.com', '$2y$10$wJ6l86h3xQy46Wl548a8a.3j555eKj1G1M4Q.O16i4K7YkK37O44W', 'admin', 1
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@hospital.com');
+
+INSERT INTO users (id, full_name, email, password_hash, role, is_active)
+SELECT 3, 'นายสมชาย สุขสมบูรณ์', 'patient@hospital.com', '$2y$10$rC6xK0hQ9E62eG2l9b1GSeP57g76vY40C2H9kI8P5A4S1D7F2G3H4', 'patient', 1
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'patient@hospital.com');
+
+INSERT INTO patients (user_id, patient_number, phone, date_of_birth)
+SELECT 3, 'HN-26-00101', '0891234567', '1995-05-15'
+WHERE NOT EXISTS (SELECT 1 FROM patients WHERE user_id = 3);
+
+-- Starter Schedules for Today and Tomorrow
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 1, CURDATE(), '09:00:00', '12:00:00', 15, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 1 AND service_date = CURDATE() AND start_time = '09:00:00');
+
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 1, CURDATE(), '13:00:00', '16:00:00', 15, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 1 AND service_date = CURDATE() AND start_time = '13:00:00');
+
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 2, CURDATE(), '09:00:00', '12:00:00', 10, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 2 AND service_date = CURDATE() AND start_time = '09:00:00');
+
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 2, CURDATE(), '13:00:00', '16:00:00', 10, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 2 AND service_date = CURDATE() AND start_time = '13:00:00');
+
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 3, CURDATE(), '09:00:00', '12:00:00', 12, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 3 AND service_date = CURDATE() AND start_time = '09:00:00');
+
+INSERT INTO schedules (department_id, service_date, start_time, end_time, capacity, booked_count, is_open)
+SELECT 3, CURDATE(), '13:00:00', '16:00:00', 12, 0, 1
+WHERE NOT EXISTS (SELECT 1 FROM schedules WHERE department_id = 3 AND service_date = CURDATE() AND start_time = '13:00:00');
+

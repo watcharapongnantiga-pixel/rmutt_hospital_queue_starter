@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ดผู้รับบริการ | RMUTT Hospital Queue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body class="dashboard-wrapper">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html" aria-label="หน้าแรก">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">หน้าแรก</a>
+        <a class="active" href="dashboard.html">แดชบอร์ด</a>
+        <a href="book.html">จองคิวออนไลน์</a>
+        <a href="queue_display.html" target="_blank">จอแสดงผลคิว (TV) ↗</a>
+        <a href="staff_queue.html" style="color:#2563eb; font-weight:600;">ระบบเจ้าหน้าที่ 🩺</a>
+      </nav>
+      <div class="nav-actions">
+        <span class="user-menu-pill">
+          <span class="user-menu-avatar" id="headerAvatar">U</span>
+          <span id="headerName">ผู้ใช้งาน</span>
+        </span>
+        <button type="button" class="btn btn-ghost btn-small" onclick="AppDB.logout()" title="ออกจากระบบ">
+          ออกจากระบบ ⎋
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="dashboard-hero">
+    <div class="container">
+      <div class="dash-user-row">
+        <div class="dash-user-profile">
+          <div class="dash-avatar" id="heroAvatar">U</div>
+          <div class="dash-user-meta">
+            <h1>สวัสดีคุณ <span id="heroFullName">ผู้รับบริการ</span></h1>
+            <div class="dash-user-badges">
+              <span class="badge badge-role-patient" id="heroRoleBadge">
+                ● ผู้รับบริการ (คนไข้)
+              </span>
+              <span class="badge badge-hn" id="heroHNBadge">HN: —</span>
+            </div>
+          </div>
+        </div>
+        <div class="dash-actions-top">
+          <a href="book.html" class="btn btn-white btn-small">
+            ＋ จองคิวตรวจใหม่
+          </a>
+          <a href="staff_queue.html" class="btn btn-primary btn-small" style="background:#2563eb;">
+            🩺 คอนโซลเจ้าหน้าที่
+          </a>
+          <button type="button" class="btn btn-outline-light btn-small" onclick="AppDB.logout()">
+            ออกจากระบบ
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="container">
+
+      <div id="flashContainer"></div>
+
+      <div class="dash-grid">
+        <!-- Left: Quick Actions and Recent Appointments -->
+        <div class="dash-col-main">
+
+          <div class="dash-card">
+            <h2 class="dash-card-title">เมนูบริการด่วน (Quick Services)</h2>
+            <div class="quick-action-cards">
+              <a href="book.html" class="quick-btn">
+                <div class="quick-icon blue">▦</div>
+                <div class="quick-text">
+                  <h4>จองคิวออนไลน์</h4>
+                  <p>เลือกแผนกบริการ วัน และเวลานัดหมายล่วงหน้า</p>
+                </div>
+              </a>
+              <a href="queue_display.html" target="_blank" class="quick-btn">
+                <div class="quick-icon purple">📺</div>
+                <div class="quick-text">
+                  <h4>จอแสดงผลคิวสด (TV)</h4>
+                  <p>เปิดดูหน้าจอเรียกคิวขนาดใหญ่พร้อมเสียงอ่าน</p>
+                </div>
+              </a>
+              <a href="staff_queue.html" class="quick-btn">
+                <div class="quick-icon green">🩺</div>
+                <div class="quick-text">
+                  <h4>ระบบเรียกคิวเจ้าหน้าที่</h4>
+                  <p>สำหรับแพทย์/พยาบาลในการกดเรียกและบันทึกคิว</p>
+                </div>
+              </a>
+              <a href="#history" class="quick-btn">
+                <div class="quick-icon amber">✓</div>
+                <div class="quick-text">
+                  <h4>ประวัติการนัดหมาย</h4>
+                  <p>ดูรายการนัดหมายย้อนหลังและพิมพ์บัตรคิว</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="dash-card" id="history">
+            <h2 class="dash-card-title">
+              <span>รายการนัดหมายและคิวล่าสุด</span>
+              <small style="font-size: 12px; color: #8794a7; font-weight: normal;" id="apptCountLabel">
+                0 รายการ
+              </small>
+            </h2>
+
+            <div id="noAppointmentsBox" style="display:none; text-align: center; padding: 35px 20px; color: #64748b;">
+              <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">📋</div>
+              <h3 style="font-size: 16px; margin: 0 0 6px; color: #1e293b;">ยังไม่มีรายการนัดหมายในขณะนี้</h3>
+              <p style="font-size: 13px; margin: 0 0 20px;">
+                คุณสามารถกดปุ่มด้านล่างเพื่อเริ่มเลือกแผนกและทำการนัดหมายคิวออนไลน์ได้ทันที</p>
+              <a href="book.html" class="btn btn-primary btn-small">เริ่มทำการจองคิว <span>→</span></a>
+            </div>
+
+            <div id="appointmentsTableWrap" style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                <thead>
+                  <tr style="border-bottom: 2px solid #eef2f7; color: #64748b;">
+                    <th style="padding: 10px 8px;">รหัสจอง</th>
+                    <th style="padding: 10px 8px;">แผนก</th>
+                    <th style="padding: 10px 8px;">วัน-เวลา</th>
+                    <th style="padding: 10px 8px;">เลขคิว</th>
+                    <th style="padding: 10px 8px;">สถานะ</th>
+                    <th style="padding: 10px 8px; text-align: right;">บัตรคิว</th>
+                  </tr>
+                </thead>
+                <tbody id="appointmentsTableBody">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right: Profile Details & Account Security -->
+        <div class="dash-col-side" id="profile">
+          <div class="dash-card">
+            <h2 class="dash-card-title">ข้อมูลผู้รับบริการ</h2>
+            <div class="profile-info-list">
+              <div class="info-item">
+                <span class="info-label">ชื่อ - นามสกุล</span>
+                <span class="info-val" id="profFullName">—</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">หมายเลขผู้ป่วย (HN)</span>
+                <span class="info-val" style="color: #2869d8;" id="profHN">—</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">อีเมล</span>
+                <span class="info-val" id="profEmail">—</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">เบอร์โทรศัพท์</span>
+                <span class="info-val" id="profPhone">—</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">วันเดือนปีเกิด</span>
+                <span class="info-val" id="profDOB">—</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">ระบบจัดเก็บข้อมูล</span>
+                <span class="info-val" style="color: #10b981;">HTML5 Web Storage</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <h2 class="dash-card-title">ความปลอดภัย & การเข้าถึง</h2>
+            <div class="profile-info-list">
+              <div class="info-item">
+                <span class="info-label">ระดับสิทธิ์</span>
+                <span class="info-val" id="profRoleLabel">ผู้รับบริการ</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">สถานะบัญชี</span>
+                <span class="info-val" style="color: #10b981;">✓ ใช้งานได้ปกติ (Active)</span>
+              </div>
+            </div>
+            <div style="margin-top: 18px;">
+              <button type="button" onclick="AppDB.logout()" class="btn btn-ghost"
+                style="width: 100%; border-color: #fecaca; color: #dc2626;">
+                ออกจากระบบอย่างปลอดภัย
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© 2026 RMUTT Hospital Queue — แดชบอร์ดผู้รับบริการ</span>
+      <a href="index.html" style="color: inherit;">กลับหน้าแรก</a>
+    </div>
+  </footer>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    const user = AppDB.requireLogin('login.html');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!user) return;
+
+      // Render Flash
+      const flash = AppDB.renderFlash();
+      if (flash) {
+        document.getElementById('flashContainer').innerHTML = flash;
+      }
+
+      // Populate User Meta
+      const initial = user.full_name ? user.full_name.charAt(0) : 'U';
+      document.getElementById('headerAvatar').textContent = initial;
+      document.getElementById('headerName').textContent = user.full_name;
+      document.getElementById('heroAvatar').textContent = initial;
+      document.getElementById('heroFullName').textContent = user.full_name;
+      document.getElementById('heroRoleBadge').textContent = '● ' + AppDB.getRoleLabel(user.role);
+      document.getElementById('heroHNBadge').textContent = user.hn ? 'HN: ' + user.hn : 'HN: ยังไม่ออกเลข';
+
+      // Profile side card
+      document.getElementById('profFullName').textContent = user.full_name;
+      document.getElementById('profHN').textContent = user.hn || '—';
+      document.getElementById('profEmail').textContent = user.email;
+      document.getElementById('profPhone').textContent = user.phone || '—';
+      document.getElementById('profDOB').textContent = user.dob || '—';
+      document.getElementById('profRoleLabel').textContent = AppDB.getRoleLabel(user.role);
+
+      loadAppointments();
+
+      // Listen for updates from other tabs
+      window.addEventListener('storage', loadAppointments);
+      window.addEventListener('app_db_update', loadAppointments);
+    });
+
+    function loadAppointments() {
+      const appts = AppDB.getUserAppointments(user.id);
+      document.getElementById('apptCountLabel').textContent = `${appts.length} รายการ`;
+
+      const tbody = document.getElementById('appointmentsTableBody');
+      const tableWrap = document.getElementById('appointmentsTableWrap');
+      const noBox = document.getElementById('noAppointmentsBox');
+
+      if (!appts || appts.length === 0) {
+        tableWrap.style.display = 'none';
+        noBox.style.display = 'block';
+        return;
+      }
+
+      tableWrap.style.display = 'block';
+      noBox.style.display = 'none';
+
+      const statusBadges = {
+        'waiting': { bg: '#fef3c7', col: '#92400e', text: 'รอตรวจ' },
+        'called': { bg: '#dbeafe', col: '#1d4ed8', text: '🔔 กำลังเรียก' },
+        'serving': { bg: '#f3e8ff', col: '#7e22ce', text: '🩺 เข้าตรวจ' },
+        'completed': { bg: '#dcfce7', col: '#15803d', text: '✓ เสร็จสิ้น' },
+        'skipped': { bg: '#f1f5f9', col: '#64748b', text: 'ข้ามคิว' },
+        'cancelled': { bg: '#fee2e2', col: '#b91c1c', text: '✕ ยกเลิก' }
+      };
+
+      tbody.innerHTML = appts.map(a => {
+        const badge = statusBadges[a.queue_status] || { bg: '#eaf2ff', col: '#2869d8', text: a.queue_status };
+        return `
+          <tr style="border-bottom: 1px solid #f1f4f9;">
+            <td style="padding: 12px 8px; font-weight: 600; color: #2869d8;">
+              <a href="ticket.html?code=${encodeURIComponent(a.booking_code)}" style="text-decoration:underline;">
+                ${a.booking_code}
+              </a>
+            </td>
+            <td style="padding: 12px 8px;">${a.department_name}</td>
+            <td style="padding: 12px 8px;">
+              ${a.service_date}<br>
+              <small style="color: #64748b;">${a.start_time} - ${a.end_time} น.</small>
+            </td>
+            <td style="padding: 12px 8px; font-weight: 700; color: #0d213a;">
+              <span style="font-size: 16px; color: #2563eb;">${a.queue_number}</span>
+            </td>
+            <td style="padding: 12px 8px;">
+              <span class="badge" style="background:${badge.bg}; color:${badge.col};">
+                ${badge.text}
+              </span>
+            </td>
+            <td style="padding: 12px 8px; text-align: right;">
+              <a href="ticket.html?code=${encodeURIComponent(a.booking_code)}" class="btn btn-ghost btn-small" style="padding: 6px 10px; font-size: 11px;">
+                ดูบัตรคิว ↗
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+
+</html>

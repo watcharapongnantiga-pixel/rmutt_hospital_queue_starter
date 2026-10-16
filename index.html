@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจองคิวออนไลน์ | RMUTT Hospital Queue</title>
+  <meta name="description" content="ต้นแบบระบบจองคิวออนไลน์และติดตามสถานะคิว RMUTT HEALTH">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body>
+  <div class="announcement">
+    <div class="container announcement-inner">
+      <span><span class="status-dot"></span> ระบบจองคิวออนไลน์ RMUTT HEALTH (HTML5 + Web Storage)</span>
+      <span class="announcement-note">หากเป็นกรณีฉุกเฉิน โปรดติดต่อหน่วยบริการฉุกเฉินโดยตรง</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html" aria-label="หน้าแรก">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
+      <nav class="main-nav" id="mainNav">
+        <a class="active" href="index.html">หน้าแรก</a>
+        <a id="navDashboardLink" href="dashboard.html" style="display:none;">แดชบอร์ด</a>
+        <a id="navBookingLink" href="book.html" style="display:none;">จองคิวออนไลน์</a>
+        <a href="#services">บริการของเรา</a>
+        <a href="queue_display.html" target="_blank">จอแสดงผลคิว (TV) ↗</a>
+        <a href="staff_queue.html" style="color:#2563eb; font-weight:600;">ระบบเจ้าหน้าที่ 🩺</a>
+        <a href="#how-it-works">ขั้นตอนการจอง</a>
+      </nav>
+      <div class="nav-actions" id="navAuthActions">
+        <!-- Injected via JavaScript based on login state -->
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" style="padding-top: 15px;" id="flashContainer">
+      <!-- Flash alerts -->
+    </div>
+
+    <section class="hero">
+      <div class="hero-glow glow-one"></div>
+      <div class="hero-glow glow-two"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-icon">✦</span> HEALTHCARE, MADE SIMPLER</div>
+          <h1>ดูแลสุขภาพ<br>เริ่มต้นได้ง่าย ๆ<br><span>ไม่ต้องรอคิวนาน</span></h1>
+          <p class="hero-description">จองคิวเข้ารับบริการ ตรวจสอบสถานะ และวางแผนเวลาของคุณได้ในที่เดียว สะดวกขึ้น
+            ชัดเจนขึ้น ทุกขั้นตอน</p>
+          <div class="hero-actions" id="heroActionButtons">
+            <a class="btn btn-primary btn-large" href="book.html">จองคิวเข้ารับบริการ <span
+                aria-hidden="true">→</span></a>
+            <a class="btn btn-outline-light btn-large" href="#how-it-works">ดูขั้นตอนการจอง</a>
+          </div>
+          <div class="hero-assurance">
+            <span class="assurance-icon">✓</span>
+            <span>ออกแบบเพื่อให้เข้าถึงบริการได้สะดวกยิ่งขึ้น</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="ภาพสรุปการจองคิว">
+          <div class="visual-orbit orbit-a"></div>
+          <div class="visual-orbit orbit-b"></div>
+          <div class="floating-label label-top"><span
+              class="mini-icon blue">◷</span><span><b>จัดการเวลาของคุณ</b><small>วางแผนก่อนเข้ารับบริการ</small></span>
+          </div>
+          <div class="appointment-card">
+            <div class="appointment-head">
+              <div><span class="card-kicker">YOUR HEALTH, YOUR TIME</span>
+                <h3>การนัดหมายของคุณ</h3>
+              </div>
+              <div class="calendar-icon">▦</div>
+            </div>
+            <div class="appointment-line"><span
+                class="line-icon">＋</span><span><small>บริการ</small><b>เลือกแผนกที่ต้องการ</b></span><span
+                class="line-arrow">›</span></div>
+            <div class="appointment-line"><span
+                class="line-icon">◷</span><span><small>วันและเวลา</small><b>เลือกช่วงเวลาที่สะดวก</b></span><span
+                class="line-arrow">›</span></div>
+            <div class="appointment-footer"><span class="footer-check">✓</span><span>ยืนยันข้อมูลก่อนส่งคำขอจอง</span>
+            </div>
+            <a class="btn btn-primary card-cta" href="book.html">เริ่มจองคิว <span>→</span></a>
+          </div>
+          <div class="floating-label label-bottom"><span
+              class="mini-icon green">✓</span><span><b>ติดตามได้ทุกขั้นตอน</b><small>ตรวจสอบสถานะคิวของคุณ</small></span>
+          </div>
+          <div class="decorative-cross cross-one">+</div>
+          <div class="decorative-cross cross-two">+</div>
+        </div>
+      </div>
+      <div class="hero-bottom-line"></div>
+    </section>
+
+    <section class="trust-strip">
+      <div class="container trust-inner">
+        <div class="trust-heading"><span
+            class="trust-symbol">✚</span><span><b>บริการสุขภาพที่เข้าถึงง่าย</b><small>เริ่มต้นจัดการนัดหมายออนไลน์</small></span>
+        </div>
+        <div class="trust-item"><b>01</b><span>จองคิวสะดวก</span></div>
+        <div class="trust-item"><b>02</b><span>ติดตามสถานะได้</span></div>
+        <div class="trust-item"><b>03</b><span>ข้อมูลเป็นระเบียบ</span></div>
+      </div>
+    </section>
+
+    <section class="section services-section" id="services">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow eyebrow-dark">OUR SERVICES</div>
+            <h2>บริการที่ออกแบบ<br class="mobile-break">เพื่อคุณ</h2>
+          </div>
+          <p>เข้าถึงข้อมูลที่จำเป็นก่อนเข้ารับบริการ<br>ผ่านหน้าจอที่ใช้งานง่ายและเป็นขั้นตอน</p>
+        </div>
+        <div class="service-grid">
+          <article class="service-card featured">
+            <div class="service-icon icon-blue">▦</div><span class="service-number">01 / BOOKING</span>
+            <h3>จองคิวออนไลน์</h3>
+            <p>เลือกแผนก วัน และช่วงเวลาที่สะดวก พร้อมตรวจสอบรายละเอียดก่อนยืนยัน</p><a href="book.html"
+              class="text-link">เริ่มจองคิว <span>→</span></a>
+          </article>
+          <article class="service-card">
+            <div class="service-icon icon-purple">◷</div><span class="service-number">02 / QUEUE STATUS</span>
+            <h3>ติดตามคิวสด (Live Display)</h3>
+            <p>ตรวจสอบหมายเลขคิว สถานะการให้บริการ และเสียงเรียกตรวจแบบเรียลไทม์</p><a href="queue_display.html"
+              target="_blank" class="text-link">เปิดจอคิวสด <span>→</span></a>
+          </article>
+          <article class="service-card">
+            <div class="service-icon icon-green">⌖</div><span class="service-number">03 / STAFF CONSOLE</span>
+            <h3>ระบบเจ้าหน้าที่ห้องตรวจ</h3>
+            <p>สำหรับแพทย์และพยาบาลในการกดเรียกคิวและบันทึกผลการตรวจ</p><a href="staff_queue.html"
+              class="text-link">คอนโซลเจ้าหน้าที่ <span>→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="queue-section" id="queue-info">
+      <div class="container queue-banner">
+        <div class="queue-banner-copy">
+          <div class="eyebrow eyebrow-light">QUEUE INFORMATION</div>
+          <h2>วางแผนก่อนมา<br>มั่นใจทุกขั้นตอน</h2>
+          <p>ระบบเชื่อมต่อข้อมูลการเรียกคิวแบบเรียลไทม์ คุณสามารถตรวจสอบสถานะคิวและข้อมูลการนัดหมายได้จากหน้านี้</p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="queue_display.html" target="_blank" class="btn btn-white">เปิดจอแสดงผลคิว (Live TV)
+              <span>↗</span></a>
+            <a href="book.html" class="btn btn-outline-light">จองคิวตรวจใหม่ <span>→</span></a>
+          </div>
+        </div>
+        <div class="queue-preview">
+          <div class="preview-top"><span>QUEUE OVERVIEW</span><span class="preview-live"><i
+                style="background:#22c55e;"></i> LIVE SYSTEM</span></div>
+          <div class="preview-main">
+            <div><small>หมายเลขคิวตัวอย่าง</small><strong>A001</strong><span class="preview-status"
+                style="background:#eaf2ff; color:#2563eb;">ระบบพร้อมใช้งาน</span></div>
+            <div class="preview-ticket">Q</div>
+          </div>
+          <div class="preview-divider"></div>
+          <div class="preview-stats">
+            <div><small>ระบบเรียกคิว</small><b style="color:#2563eb;">เรียลไทม์ + เสียงอ่าน</b></div>
+            <div><small>เวลารอโดยประมาณ</small><b>10 - 15 นาที</b></div>
+          </div>
+          <p class="preview-note">รองรับการแสดงผลบนสมาร์ทโฟน แท็บเล็ต และจอทีวีดิจิทัล</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section steps-section" id="how-it-works">
+      <div class="container">
+        <div class="section-heading centered">
+          <div class="eyebrow eyebrow-dark">HOW IT WORKS</div>
+          <h2>จองคิวได้ใน 4 ขั้นตอน</h2>
+          <p>เตรียมข้อมูลให้พร้อม แล้วดำเนินการตามขั้นตอนที่แสดงบนหน้าจอ</p>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-count">01</div>
+            <div class="step-icon">♙</div>
+            <h3>เข้าสู่ระบบ</h3>
+            <p>สมัครสมาชิกหรือเข้าสู่ระบบด้วยบัญชีของคุณ</p>
+          </div>
+          <div class="step-card">
+            <div class="step-count">02</div>
+            <div class="step-icon">✚</div>
+            <h3>เลือกบริการ</h3>
+            <p>เลือกแผนกและช่วงเวลาที่เปิดให้จอง</p>
+          </div>
+          <div class="step-card">
+            <div class="step-count">03</div>
+            <div class="step-icon">▦</div>
+            <h3>ยืนยันการจอง</h3>
+            <p>ตรวจสอบข้อมูลและรับบัตรคิวนัดหมาย</p>
+          </div>
+          <div class="step-card">
+            <div class="step-count">04</div>
+            <div class="step-icon">✓</div>
+            <h3>ติดตามสถานะ</h3>
+            <p>ดูสถานะคิวบนจอ TV และรอเสียงเรียกรับบริการ</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <a class="brand footer-brand" href="index.html">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy"><strong>RMUTT <span>HEALTH</span></strong><small>SMART QUEUE SYSTEM</small></div>
+      </a>
+      <p>ระบบต้นแบบสำหรับพัฒนาการจองคิวและบริหารจัดการคิวผู้รับบริการ</p>
+      <a href="#top" class="back-top">กลับด้านบน ↑</a>
+    </div>
+    <div class="container footer-bottom"><span>© 2026 RMUTT Hospital Queue — Web Application (HTML /
+        JS)</span><span>พร้อมใช้งานได้ทันทีบนเบราว์เซอร์ทุกอุปกรณ์</span></div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Flash message
+      const flashHtml = AppDB.renderFlash();
+      if (flashHtml) {
+        document.getElementById('flashContainer').innerHTML = flashHtml;
+      }
+
+      // Dynamic Auth Nav & Hero actions
+      const user = AppDB.getCurrentUser();
+      const authNav = document.getElementById('navAuthActions');
+      const dashLink = document.getElementById('navDashboardLink');
+      const bookLink = document.getElementById('navBookingLink');
+      const heroActions = document.getElementById('heroActionButtons');
+
+      if (user) {
+        dashLink.style.display = 'inline-block';
+        bookLink.style.display = 'inline-block';
+
+        const initial = user.full_name ? user.full_name.charAt(0) : 'U';
+        authNav.innerHTML = `
+          <a class="user-menu-pill" href="dashboard.html" title="ไปที่แดชบอร์ด">
+            <span class="user-menu-avatar">${initial}</span>
+            <span>${user.full_name}</span>
+          </a>
+          <button type="button" class="btn btn-ghost btn-small" onclick="AppDB.logout()">ออกจากระบบ</button>
+        `;
+
+        heroActions.innerHTML = `
+          <a class="btn btn-primary btn-large" href="book.html">จองคิวตรวจใหม่ <span aria-hidden="true">→</span></a>
+          <a class="btn btn-outline-light btn-large" href="dashboard.html">แดชบอร์ดของฉัน</a>
+        `;
+      } else {
+        authNav.innerHTML = `
+          <a class="btn btn-ghost" href="login.html">เข้าสู่ระบบ</a>
+          <a class="btn btn-primary btn-small" href="register.html">สมัครสมาชิก <span aria-hidden="true">↗</span></a>
+        `;
+      }
+    });
+  </script>
+</body>
+
+</html>

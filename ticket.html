@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บัตรคิวนัดหมาย | RMUTT Hospital Queue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/queue.css">
+</head>
+
+<body style="background: #f8fafc;">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"><span>Q</span></div>
+        <div class="brand-copy">
+          <strong>RMUTT <span>HEALTH</span></strong>
+          <small>SMART QUEUE SYSTEM</small>
+        </div>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">หน้าแรก</a>
+        <a href="dashboard.html">แดชบอร์ด</a>
+        <a href="book.html">จองคิวใหม่</a>
+        <a href="queue_display.html" target="_blank">จอแสดงผลคิว (TV) ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-ghost btn-small">← กลับสู่แดชบอร์ด</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="ticket-wrapper">
+
+      <div id="flashContainer"></div>
+
+      <div class="ticket-card" id="ticketCardArea">
+
+        <!-- Ticket Header -->
+        <div class="ticket-header">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <span class="ticket-badge-pill">RMUTT HEALTHCARE PASS</span>
+              <h1 class="ticket-dept-title" id="tDeptName">กำลังโหลดข้อมูล...</h1>
+              <span class="ticket-location" id="tLocation">📍 จุดตรวจบริการ</span>
+            </div>
+            <div style="text-align:right;">
+              <small style="color: #94a3b8; font-size: 11px;">รหัสการจอง (Booking Code)</small>
+              <div style="font-weight:700; font-size:14px; letter-spacing:0.5px;" id="tBookingCode">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket Number Area -->
+        <div class="ticket-number-area">
+          <div class="ticket-queue-label">หมายเลขคิวของคุณ</div>
+          <div class="ticket-queue-num" id="tQueueNum">— — —</div>
+          <div>
+            <span class="ticket-status-pill ticket-status-waiting" id="tStatusPill">
+              ● รอเรียกตรวจ (Waiting)
+            </span>
+          </div>
+        </div>
+
+        <!-- Ticket Details -->
+        <div class="ticket-details">
+          <div class="ticket-grid">
+            <div class="ticket-grid-item">
+              <small>ชื่อ - นามสกุล ผู้รับบริการ</small>
+              <strong id="tFullName">—</strong>
+            </div>
+            <div class="ticket-grid-item">
+              <small>หมายเลขประจำตัวผู้ป่วย (HN)</small>
+              <strong style="color: #2563eb;" id="tHN">—</strong>
+            </div>
+            <div class="ticket-grid-item">
+              <small>วันที่นัดหมายตรวจ</small>
+              <strong id="tDate">—</strong>
+            </div>
+            <div class="ticket-grid-item">
+              <small>รอบเวลาที่นัดหมาย</small>
+              <strong id="tTime">—</strong>
+            </div>
+            <div class="ticket-grid-item" id="tNotesWrap" style="grid-column: 1 / -1; display:none;">
+              <small>อาการเบื้องต้น / บันทึก</small>
+              <span id="tNotes">—</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-size: 11px; color: #64748b; line-height: 1.6;">
+                * กรุณาเดินทางมาถึงก่อนเวลานัดหมาย 15 นาที พร้อมนำบัตรประชาชนมาแสดงที่เคาน์เตอร์<br>
+                * คุณสามารถเปิดหน้านี้บนมือถือหรือบันทึกภาพหน้าจอไว้เพื่อแสดงต่อเจ้าหน้าที่
+              </div>
+              <div style="text-align:center; padding-left: 15px;">
+                <div
+                  style="width:55px; height:55px; background:#f1f5f9; border-radius:10px; display:grid; place-items:center; font-size:24px; color:#2563eb;">
+                  📱
+                </div>
+                <small style="font-size:9px; color:#94a3b8;">บัตรคิวดิจิทัล</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="ticket-actions">
+          <button type="button" class="btn btn-primary" onclick="window.print()" style="flex:1;">
+            🖨️ พิมพ์บัตรคิว / บันทึก PDF
+          </button>
+          <a href="queue_display.html" target="_blank" class="btn btn-ghost" style="flex:1;">
+            📺 ดูจอเรียกคิวสด (TV) ↗
+          </a>
+        </div>
+
+      </div>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="dashboard.html" style="color: #64748b; font-size: 13px; text-decoration: underline;">
+          ← กลับไปยังหน้าแดชบอร์ดหลัก
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>© 2026 RMUTT Hospital Queue — บัตรคิวดิจิทัล</span>
+      <a href="index.html" style="color: inherit;">หน้าแรก</a>
+    </div>
+  </footer>
+
+  <script src="assets/js/app-db.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Flash message
+      const flash = AppDB.renderFlash();
+      if (flash) {
+        document.getElementById('flashContainer').innerHTML = flash;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (!code) {
+        alert('ไม่พบรหัสบัตรคิว');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      loadTicket(code);
+
+      // Listen for updates from other tabs (e.g. staff calls queue)
+      window.addEventListener('storage', () => loadTicket(code));
+      window.addEventListener('app_db_update', () => loadTicket(code));
+    });
+
+    function loadTicket(code) {
+      const ticket = AppDB.getAppointmentByCode(code);
+      if (!ticket) {
+        alert('ไม่พบบัตรคิวนัดหมายตามรหัสนี้');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      document.title = `บัตรคิว ${ticket.queue_number} | RMUTT Hospital Queue`;
+
+      document.getElementById('tDeptName').textContent = ticket.department_name;
+      document.getElementById('tLocation').textContent = '📍 ' + (ticket.location || 'จุดตรวจบริการ');
+      document.getElementById('tBookingCode').textContent = ticket.booking_code;
+      document.getElementById('tQueueNum').textContent = ticket.queue_number;
+
+      document.getElementById('tFullName').textContent = ticket.full_name;
+      document.getElementById('tHN').textContent = ticket.hn || '—';
+
+      // Date format
+      const parts = ticket.service_date.split('-');
+      if (parts.length === 3) {
+        document.getElementById('tDate').textContent = `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}`;
+      } else {
+        document.getElementById('tDate').textContent = ticket.service_date;
+      }
+
+      document.getElementById('tTime').textContent = `${ticket.start_time} - ${ticket.end_time} น.`;
+
+      if (ticket.notes) {
+        document.getElementById('tNotesWrap').style.display = 'block';
+        document.getElementById('tNotes').textContent = ticket.notes;
+      } else {
+        document.getElementById('tNotesWrap').style.display = 'none';
+      }
+
+      // Status Badge
+      const statusMeta = {
+        'waiting': { text: 'รอเรียกตรวจ (Waiting)', class: 'ticket-status-waiting' },
+        'called': { text: 'กำลังเรียกคิว! (Called)', class: 'ticket-status-called' },
+        'serving': { text: 'กำลังรับบริการตรวจ (Serving)', class: 'ticket-status-serving' },
+        'completed': { text: 'ตรวจเสร็จสิ้นแล้ว (Completed)', class: 'ticket-status-completed' },
+        'skipped': { text: 'ข้ามคิว (Skipped)', class: 'ticket-status-waiting' },
+        'cancelled': { text: 'ยกเลิก (Cancelled)', class: 'ticket-status-cancelled' }
+      };
+
+      const meta = statusMeta[ticket.queue_status] || statusMeta['waiting'];
+      const pill = document.getElementById('tStatusPill');
+      pill.className = `ticket-status-pill ${meta.class}`;
+      pill.textContent = '● ' + meta.text;
+    }
+  </script>
+</body>
+
+</html>
